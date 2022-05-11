@@ -39,19 +39,12 @@ def mat_tucker_decomposition(layer, eng, energy_factor):
     first = np.asarray(factors[1], dtype=np.float32)
     core = np.asarray(factors[2], dtype=np.float32)
 
-    print(weights.shape)
-    print(first.shape)
-    print(np.expand_dims(np.moveaxis(first, 0, 1), axis=(2, 3)).shape)
-    print(core.shape)
-    print(last.shape)
-    print(np.expand_dims(last, axis=(2, 3)).shape)
-
     first_weights = np.expand_dims(np.moveaxis(first, 0, 1), axis=(2, 3)).copy()
     last_weights = np.expand_dims(last, axis=(2, 3)).copy()
 
     first_layer = torch.nn.Conv2d(
-        in_channels=first.shape[0],
-        out_channels=first.shape[1],
+        in_channels=layer.in_channels,
+        out_channels=R1,
         kernel_size=1,
         stride=1,
         padding=0,
@@ -60,8 +53,8 @@ def mat_tucker_decomposition(layer, eng, energy_factor):
     )
 
     core_layer = torch.nn.Conv2d(
-        in_channels=core.shape[1],
-        out_channels=core.shape[0],
+        in_channels=R2,
+        out_channels=R1,
         kernel_size=layer.kernel_size,
         stride=layer.stride,
         padding=layer.padding,
@@ -70,8 +63,8 @@ def mat_tucker_decomposition(layer, eng, energy_factor):
     )
 
     last_layer = torch.nn.Conv2d(
-        in_channels=last.shape[1],
-        out_channels=last.shape[0],
+        in_channels=R1,
+        out_channels=layer.out_channels,
         kernel_size=1,
         stride=1,
         padding=0,
